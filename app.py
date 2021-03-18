@@ -21,7 +21,7 @@ Base.prepare(engine, reflect = True)
 
 #Save references to the table
 Msrm = Base.classes.measurement
-
+Stat = Base.classes.station
 #Flask setup
 
 app = Flask(__name__)
@@ -33,18 +33,23 @@ def Welcome():
     """List all available api routes."""
     return (
         """Available Routes:<br/>
-        /api/v1.0/precipitation
+
+        /api/v1.0/precipitation<br/>
+        /api/v1.0/stations<br/>
+        /api/v1.0/tobs<br/>
+        /api/v1.0/<start><br/>
+        /api/v1.0/<start>/<end><br/>
         """
     )
 
 @app.route("/api/v1.0/precipitation")
-def names():
+def daily_prcp():
     #Create session link from Python to DB
     session = Session(engine)
 
     """Return a list of dates and precipitation"""
     #Query dates & prcp
-    results = session.query(Msrm.dates, Msrm.prcp).all()
+    results = session.query(Msrm.date, Msrm.prcp).all()
 
     session.close()
 
@@ -52,6 +57,41 @@ def names():
     prcp_data = list(np.ravel(results))
 
     return jsonify(prcp_data)
+
+@app.route("/api/v1.0/stations")
+
+def stations_names():
+    #Create session link from Python to DB
+    session = Session(engine)
+
+    """Return a list of stations and names"""
+    #Query station and names
+    results = session.query(Stat.station, Stat.name).all()
+
+    session.close()
+
+    # Convert list of tuples into normal list
+    station_data = list(np.ravel(results))
+
+    return jsonify(station_data)
+
+@app.route("/api/v1.0/tobs")
+
+def active_station():
+    #Create session link from Python to DB
+    session = Session(engine)
+
+    """Return a list of dates and temperature"""
+    #Query dates & tobs
+    results = session.query(Msrm.date, Msrm.tobs).filter(Msrm.station == 'USC00519281').filter(Msrm.date>='2017-08-23').all()
+
+    session.close()
+
+    # Convert list of tuples into normal list
+    active_station = list(np.ravel(results))
+
+    return jsonify()
+
 
 if __name__ == '__main__':
     app.run(debug=True)
