@@ -39,9 +39,9 @@ def Welcome():
         /api/v1.0/precipitation<br/>
         /api/v1.0/stations<br/>
         /api/v1.0/tobs<br/>
-        *You can search temperature stats data from a starting date adding the date after the slash (/) with the format yyyy-mm-dd
+        *You can search temperature stats from a starting date adding the date after the slash (/) with the format yyyy-mm-dd<br/>
         /api/v1.0/<start><br/>
-        *You can search temperature stats data between date adding the starting date after the first slash (/) and the end after the second one with the format yyyy-mm-dd
+        *You can search temperature stats between dates adding the starting date after the first slash (/) and the end after the second one with the format yyyy-mm-dd<br/>
         /api/v1.0/<start>/<end><br/>
         """
     )
