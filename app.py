@@ -7,6 +7,8 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 
+import datetime as dt
+
 from flask import Flask, jsonify
 
 #Database Setup
@@ -91,6 +93,7 @@ def daily_temp():
 
     """Return a list of dates and temperatures of the most active station for the last year of the data"""
     #Query station and names
+
     results = session.query(Msrm.date, Msrm.tobs).filter(Msrm.station == "USC00519281").filter(Msrm.date >= "2016-08-23").all()
 
     session.close()
@@ -120,15 +123,39 @@ def tobs_start_date(start):
 
     stats_tobs= []
 
-    for min_tobs, max_tobs, avg_tobs in results:
+    for min_tobs, avg_tobs, max_tobs in results:
         stobs_dict={}
         stobs_dict["min_tobs"] = min_tobs
-        stobs_dict["max_tobs"] = max_tobs
         stobs_dict["avg_tobs"] = avg_tobs
+        stobs_dict["max_tobs"] = max_tobs
         stats_tobs.append(stobs_dict)
 
     return jsonify(stats_tobs)
     
+@app.route("/api/v1.0/<start>/<end>")
+
+def tobs_between_dates(start, end):
+    
+    #Create session link from Python to DB
+    session = Session(engine)
+
+    """Return min, max and avg temperature of for a given start date"""
+    #Query temperature
+    results = session.query(func.min(Msrm.tobs), func.max(Msrm.tobs), func.avg(Msrm.tobs)).filter(Msrm.date >= start). \
+    filter(Msrm.date <= end).all()
+
+    session.close()
+
+    stats_tobs_btw= []
+
+    for min_tobs, avg_tobs, max_tobs in results:
+        stobs_dict={}
+        stobs_dict["min_tobs"] = min_tobs
+        stobs_dict["avg_tobs"] = avg_tobs
+        stobs_dict["max_tobs"] = max_tobs
+        stats_tobs_btw.append(stobs_dict)
+
+    return jsonify(stats_tobs_btw)
 
 if __name__ == '__main__':
     app.run(debug=True)
