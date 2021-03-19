@@ -39,7 +39,9 @@ def Welcome():
         /api/v1.0/precipitation<br/>
         /api/v1.0/stations<br/>
         /api/v1.0/tobs<br/>
+        *You can search temperature stats data from a starting date adding the date after the slash (/) with the format yyyy-mm-dd
         /api/v1.0/<start><br/>
+        *You can search temperature stats data between date adding the starting date after the first slash (/) and the end after the second one with the format yyyy-mm-dd
         /api/v1.0/<start>/<end><br/>
         """
     )
@@ -139,7 +141,7 @@ def tobs_between_dates(start, end):
     #Create session link from Python to DB
     session = Session(engine)
 
-    """Return min, max and avg temperature of for a given start date"""
+    """Return min, max and avg temperature of for a given start date and end date"""
     #Query temperature
     results = session.query(func.min(Msrm.tobs), func.max(Msrm.tobs), func.avg(Msrm.tobs)).filter(Msrm.date >= start). \
     filter(Msrm.date <= end).all()
