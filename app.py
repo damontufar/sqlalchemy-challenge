@@ -105,6 +105,31 @@ def daily_temp():
 
     return jsonify(daily_tobs)
 
+@app.route("/api/v1.0/<start>")
+
+def tobs_start_date(start):
+    
+    #Create session link from Python to DB
+    session = Session(engine)
+
+    """Return min, max and avg temperature of for a given start date"""
+    #Query temperature
+    results = session.query(func.min(Msrm.tobs), func.max(Msrm.tobs), func.avg(Msrm.tobs)).filter(Msrm.date >= start).all()
+
+    session.close()
+
+    stats_tobs= []
+
+    for min_tobs, max_tobs, avg_tobs in results:
+        stobs_dict={}
+        stobs_dict["min_tobs"] = min_tobs
+        stobs_dict["max_tobs"] = max_tobs
+        stobs_dict["avg_tobs"] = avg_tobs
+        stats_tobs.append(stobs_dict)
+
+    return jsonify(stats_tobs)
+    
+
 if __name__ == '__main__':
     app.run(debug=True)
 
