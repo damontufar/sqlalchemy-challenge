@@ -66,32 +66,44 @@ def stations_names():
 
     """Return a list of stations and names"""
     #Query station and names
-    results = session.query(Stat.station, Stat.name).all()
+    results = session.query(Stat.station, Stat.name, Stat.latitude, Stat.longitude).all()
 
     session.close()
 
-    # Convert list of tuples into normal list
-    station_data = list(np.ravel(results))
+    #Create a dictionary from the row data and append to a list
+    station_data=[]
+    for station, name, latitude, longitude in results:
+        station_dict={}
+        station_dict["station"] = station
+        station_dict["name"] = name
+        station_dict["latitude"] = latitude
+        station_dict["longitude"] = longitude
+        station_data.append(station_dict)
+    
 
     return jsonify(station_data)
 
 @app.route("/api/v1.0/tobs")
 
-def active_station():
+def daily_temp():
     #Create session link from Python to DB
     session = Session(engine)
 
-    """Return a list of dates and temperature"""
-    #Query dates & tobs
-    results = session.query(Msrm.date, Msrm.tobs).filter(Msrm.station == 'USC00519281').filter(Msrm.date>='2017-08-23').all()
+    """Return a list of dates and temperatures of the most active station for the last year of the data"""
+    #Query station and names
+    results = session.query(Msrm.date, Msrm.tobs).filter(Msrm.station == "USC00519281").filter(Msrm.date >= "2016-08-23").all()
 
     session.close()
 
-    # Convert list of tuples into normal list
-    active_station = list(np.ravel(results))
+    #Create a dictionary from the row data and append to a list
+    daily_tobs = []
+    for date, tobs in results:
+        tobs_dict={}
+        tobs_dict["date"] = date
+        tobs_dict["tobs"] = tobs
+        daily_tobs.append(tobs_dict)
 
-    return jsonify()
-
+    return jsonify(daily_tobs)
 
 if __name__ == '__main__':
     app.run(debug=True)
